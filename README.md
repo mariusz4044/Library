@@ -18,6 +18,4 @@ Simple online shop with payment method simulation.
 ```
 + JavaScript
 + Vue.js
-
 ```
-# Shop-silmulator
