@@ -1,0 +1,63 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    product_repository:
+        class: App\Products\Repository\ProductRepository
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+            
+    get_product_collection_handler:
+        class: App\Products\QueryHandler\GetProductCollectionHandler
+        arguments:
+            $repository: '@product_repository'
+
+    get_product_collection_action:
+        public: true
+        class: App\Products\Controller\GetProductCollectionAction
+        arguments:
+            $handler: '@get_product_collection_handler'
+
+    get_product_handler:
+        class: App\Products\QueryHandler\GetProductHandler
+        arguments:
+            $repository: '@product_repository'
+      
+    get_product_action:
+        public: true
+        class: App\Products\Controller\GetProductAction
+        arguments:
+            $handler: '@get_product_handler'  
+            
+    put_product_handler:
+        class: App\Products\CommandHandler\PutProductHandler
+        arguments:
+            $repository: '@product_repository'
+      
+    put_product_action:
+        public: true
+        class: App\Products\Controller\PutProductAction
+        arguments:
+            $handler: '@put_product_handler'
